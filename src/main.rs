@@ -1,4 +1,16 @@
+mod vec3;
+mod color;
+
+use vec3::*;
+use color::*;
+
+fn write_pixel(color : Color) {
+    let (r,g,b) = color.to_rgb_bytes();
+    println!("{} {} {}", r, g, b);
+}
+
 fn main() {
+
 
     let image_width = 256;
     let image_height = 256;
@@ -12,11 +24,9 @@ fn main() {
             let g = (j as f64) / ((image_height-1) as f64);
             let b = 0.25;
 
-            let ir = (255.999 * r) as u8;
-            let ig = (255.999 * g) as u8;
-            let ib = (255.999 * b) as u8;
+            let pixel_color = Color::from_rgb(r,g,b);
 
-            println!("{} {} {}", ir, ig, ib);
+            write_pixel(pixel_color);
         }
     }
     
