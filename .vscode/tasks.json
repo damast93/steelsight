@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"subcommand": "build",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Rust: cargo build - steelsight"
+		}
+		{
+			"label": "Run & Generate image",
+			"type": "process",
+			"command": "run.cmd",
+			"windows": {
+			  "command": "run.cmd"
+			},
+			"group": "build",
+			"presentation": {
+			  "reveal": "always",
+			  "panel": "new"
+			}
+		     }
+	]
+}
