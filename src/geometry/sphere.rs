@@ -29,9 +29,7 @@ impl Geometry for Sphere {
         }
         let p = r.at(root);
         let out_normal = (p - self.center) / self.radius;
-        let front_side = r.direction * out_normal < 0.0;
-        let normal = if front_side { out_normal } else { (-1.0) * out_normal };
-
+        let (normal,front_side) = Ray::orient_normal(r, out_normal);
         Some(HitRecord { t: root, p, normal, front_side })
     }
 }

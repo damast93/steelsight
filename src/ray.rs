@@ -14,4 +14,8 @@ impl Ray {
        pub fn through_points(origin : Vec3, target : Vec3) -> Ray {
               Ray { origin: origin, direction: target - origin }
        }
+
+       pub fn orient_normal(ray : Ray, outward_normal : Vec3) -> (Vec3,bool) {
+              if ray.direction * outward_normal < 0.0 { (outward_normal, true) } else { ((-1.0) * outward_normal, false) }
+       }
 }

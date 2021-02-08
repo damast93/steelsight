@@ -10,10 +10,8 @@ fn write_color(color: Color) {
     println!("{} {} {}", r, g, b);
 }
 
-fn ray_color(ray: Ray) -> Color {
-    let sphere : Sphere = Sphere { center: vec3(0.0, 0.0, -1.0), radius : 0.5 };
-
-    if let Some(hit) = sphere.hit(ray, 0.0, 1000.0) {
+fn ray_color(world: &impl Geometry, ray: Ray) -> Color {
+    if let Some(hit) = world.hit(ray, 0.0, f64::INFINITY) {
         0.5 * Color::from_rgb(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0)
     } else {
         let unit_direction = ray.direction.unit();
@@ -41,6 +39,12 @@ fn main() {
     let lower_left_corner =
         origin - horizontal / 2.0 - vertical / 2.0 - vec3(0.0, 0.0, focal_length);
 
+
+    // Make world
+    let mut world = GeometryList::new();
+    world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5 });
+    world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0 });
+
     // Render
 
     println!("P3\n{} {}\n255", image_width, image_height);
@@ -52,7 +56,7 @@ fn main() {
             let t = (j as float) / ((image_height - 1) as float);
 
             let r = Ray::through_points(origin, lower_left_corner + s * horizontal + t * vertical);
-            let pixel_color = ray_color(r);
+            let pixel_color = ray_color(&world, r);
             write_color(pixel_color);
         }
     }
