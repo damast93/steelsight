@@ -11,12 +11,32 @@ fn write_color(color : Color) {
     println!("{} {} {}", r, g, b);
 }
 
+fn hit_sphere(center : Vec3, radius : f64, r : Ray) -> f64 {
+    let oc = r.origin - center;
+    let a = r.direction * r.direction;
+    let b = 2.0 * (oc * r.direction);
+    let c = (oc*oc) - radius*radius;
+    let discriminant = b*b - 4.0*a*c;
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2.0 * a)
+    }
+}
+
 fn ray_color(r : Ray) -> Color {
-    let unit_direction = r.direction.unit();
-    let t = 0.5 * unit_direction.y + 1.0;
-    let a = Color::from_rgb(1.0, 1.0, 1.0);
-    let b = Color::from_rgb(0.5, 0.7, 1.0);
-    (1.0-t)*a + t*b
+    let t =  hit_sphere(vec3(0.0, 0.0, -1.0), 0.5, r);
+
+    if t > 0.0 {
+        let normal = (r.at(t) - vec3(0.0, 0.0, -1.0)).unit();
+        0.5 * Color::from_rgb(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0)
+    } else {
+        let unit_direction = r.direction.unit();
+        let t = 0.5 * unit_direction.y + 1.0;
+        let a = Color::from_rgb(1.0, 1.0, 1.0);
+        let b = Color::from_rgb(0.5, 0.7, 1.0);
+        (1.0-t)*a + t*b
+    }
 }
 
 fn main() {
