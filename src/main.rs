@@ -1,16 +1,9 @@
-mod color;
-mod ray;
-mod vec3;
-mod geometry;
+// Main file for bin crate 
 
-pub use color::*;
-pub use ray::*;
-pub use vec3::*;
+extern crate steelsight;
 
-#[allow(non_camel_case_types)]
-type float = f64;
-
-use geometry::*;
+use steelsight::*;
+use steelsight::geometry::*;
 
 fn write_color(color: Color) {
     let (r, g, b) = color.to_rgb_bytes();
@@ -19,7 +12,7 @@ fn write_color(color: Color) {
 
 fn ray_color(ray: Ray) -> Color {
     let sphere : Sphere = Sphere { center: vec3(0.0, 0.0, -1.0), radius : 0.5 };
-    
+
     if let Some(hit) = sphere.hit(ray, 0.0, 1000.0) {
         0.5 * Color::from_rgb(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0)
     } else {

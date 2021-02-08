@@ -1,4 +1,4 @@
-use crate::*;
+use crate::geometry::*;
 
 pub struct Sphere {
     pub center: Vec3,
@@ -28,8 +28,10 @@ impl Geometry for Sphere {
             } 
         }
         let p = r.at(root);
-        let normal = (p - self.center) / self.radius;
+        let out_normal = (p - self.center) / self.radius;
+        let front_side = r.direction * out_normal < 0.0;
+        let normal = if front_side { out_normal } else { (-1.0) * out_normal };
 
-        Some(HitRecord { t: root, p, normal })
+        Some(HitRecord { t: root, p, normal, front_side })
     }
 }

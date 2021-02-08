@@ -1,13 +1,14 @@
-use crate::*; // Import Vec3, float, etc ... (main.rs)
+use crate::*; // Import Vec3, float, etc ... (lib.rs)
 
 // Facade pattern
 mod sphere; // Declare the sphere module (sphere.rs) privately 
 pub use sphere::*; // Immediately reexport it
 
 pub struct HitRecord {
+       pub t: float,
        pub p: Vec3,
        pub normal: Vec3,
-       pub t: float,
+       pub front_side : bool
 }
 
 pub trait Geometry {
