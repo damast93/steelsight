@@ -1,3 +1,4 @@
+use super::*;
 use super::vec3::*;
 
 #[derive(Copy, Clone, Debug)]
@@ -7,7 +8,7 @@ pub struct Ray {
 }
 
 impl Ray {
-       pub fn at(self, t : f64) -> Vec3 {
+       pub fn at(self, t : float) -> Vec3 {
               self.origin + t*self.direction
        }
 

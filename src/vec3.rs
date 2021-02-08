@@ -1,13 +1,15 @@
+use super::*;
 use std::ops;
+
 
 #[derive(Copy, Clone, Debug)]
 pub struct Vec3 {
-    pub x : f64,
-    pub y : f64,
-    pub z : f64
+    pub x : float,
+    pub y : float,
+    pub z : float
 }
 
-pub fn vec3(x : f64, y : f64, z : f64) -> Vec3 { Vec3 { x, y, z } }
+pub fn vec3(x : float, y : float, z : float) -> Vec3 { Vec3 { x, y, z } }
 
 impl ops::Add<Vec3> for Vec3 {
     type Output = Vec3;
@@ -19,29 +21,29 @@ impl ops::Sub<Vec3> for Vec3 {
     fn sub(self, other : Vec3) -> Vec3 { vec3(self.x - other.x, self.y - other.y, self.z - other.z) }
 }
 
-impl ops::Mul<Vec3> for f64 {
+impl ops::Mul<Vec3> for float {
     type Output = Vec3;
     fn mul(self, v : Vec3) -> Vec3 { vec3(self * v.x, self * v.y, self * v.z) } 
 }
 
-impl ops::Mul<f64> for Vec3 {
+impl ops::Mul<float> for Vec3 {
     type Output = Vec3;
-    fn mul(self, r : f64) -> Vec3 { r * self } 
+    fn mul(self, r : float) -> Vec3 { r * self } 
 }
 
 impl ops::Mul<Vec3> for Vec3 {
-    type Output = f64;
-    fn mul(self, other : Vec3) -> f64 { self.x*other.x + self.y*other.y + self.z*other.z } 
+    type Output = float;
+    fn mul(self, other : Vec3) -> float { self.x*other.x + self.y*other.y + self.z*other.z } 
 }
 
-impl ops::Div<f64> for Vec3 {
+impl ops::Div<float> for Vec3 {
        type Output = Vec3;
-       fn div(self, d : f64) -> Vec3 { (1.0/d) * self } 
+       fn div(self, d : float) -> Vec3 { (1.0/d) * self } 
 }
 
 impl Vec3 {
-    pub fn length_squared(self : Vec3) -> f64 { self * self }
-    pub fn length(self : Vec3) -> f64 { self.length_squared().sqrt() }
+    pub fn length_squared(self : Vec3) -> float { self * self }
+    pub fn length(self : Vec3) -> float { self.length_squared().sqrt() }
     pub const ZERO : Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
     pub fn cross(a : Vec3, b : Vec3) -> Vec3 {
