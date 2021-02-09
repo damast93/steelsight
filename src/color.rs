@@ -12,9 +12,9 @@ impl Color {
        pub fn from_rgb(r : float, g : float, b : float) -> Color { Color { r, g, b } }
        pub fn to_rgb(self) -> (float,float,float) { (self.r, self.g, self.b) }
        pub fn to_rgb_bytes(self) -> (u8,u8,u8) {
-              ((255.999 * self.r) as u8,
-               (255.999 * self.g) as u8,
-               (255.999 * self.b) as u8)
+              ((256.0 * clamp(self.r, 0.0, 0.999)) as u8,
+               (256.0 * clamp(self.g, 0.0, 0.999)) as u8,
+               (256.0 * clamp(self.b, 0.0, 0.999)) as u8)
        }
 }
 

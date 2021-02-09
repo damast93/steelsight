@@ -24,6 +24,11 @@ fn ray_color(world: &impl Geometry, ray: Ray) -> Color {
 }
 
 fn main() {
+    use rand::prelude::*;
+    let mut rng = thread_rng();
+
+    let samples_per_pixel = 100;
+
     // Image
     let aspect_ratio = 16.0 / 9.0;
     let image_width: i32 = 400;
@@ -50,12 +55,18 @@ fn main() {
     for j in (0..image_height).rev() {
         eprint!("\nScanlines remaining: {}", j);
         for i in 0..image_width {
-            let s = (i as float) / ((image_width - 1) as float);
-            let t = (j as float) / ((image_height - 1) as float);
+            let mut total_color = Color::from_rgb(0.0, 0.0, 0.0);
 
-            let r = camera.get_ray(s, t);
-            let pixel_color = ray_color(&world, r);
-            write_color(pixel_color);
+            for _sample in 0..samples_per_pixel {
+                let s = (i as float + rng.gen::<float>()) / ((image_width - 1) as float);
+                let t = (j as float + rng.gen::<float>()) / ((image_height - 1) as float);
+
+                let r = camera.get_ray(s, t);
+                total_color = total_color + ray_color(&world, r);
+            }
+
+            let avg_color = (1.0 / samples_per_pixel as float) * total_color;
+            write_color(avg_color);
         }
     }
     eprintln!("\nDone");
