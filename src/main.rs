@@ -4,6 +4,7 @@ extern crate steelsight;
 
 use steelsight::*;
 use steelsight::geometry::*;
+use steelsight::camera::*;
 
 fn write_color(color: Color) {
     let (r, g, b) = color.to_rgb_bytes();
@@ -29,16 +30,13 @@ fn main() {
     let image_height = ((image_width as float) / aspect_ratio) as i32;
 
     // Camera
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * aspect_ratio;
-    let focal_length = 1.0;
-
-    let origin = vec3(0.0, 0.0, 0.0);
-    let horizontal = vec3(viewport_width, 0.0, 0.0);
-    let vertical = vec3(0.0, viewport_height, 0.0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - vec3(0.0, 0.0, focal_length);
-
+    let camera_args = CameraArgs {
+        origin: vec3(0.0, 0.0, 0.0),
+        viewport_height: 2.0,
+        focal_length: 1.0,
+        aspect_ratio,
+    };
+    let camera = Camera::new(camera_args);
 
     // Make world
     let mut world = GeometryList::new();
@@ -55,7 +53,7 @@ fn main() {
             let s = (i as float) / ((image_width - 1) as float);
             let t = (j as float) / ((image_height - 1) as float);
 
-            let r = Ray::through_points(origin, lower_left_corner + s * horizontal + t * vertical);
+            let r = camera.get_ray(s, t);
             let pixel_color = ray_color(&world, r);
             write_color(pixel_color);
         }
