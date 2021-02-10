@@ -6,14 +6,34 @@ use steelsight::*;
 use steelsight::geometry::*;
 use steelsight::camera::*;
 
+use rand::prelude::*;
+
 fn write_color(color: Color) {
-    let (r, g, b) = color.to_rgb_bytes();
-    println!("{} {} {}", r, g, b);
+    let (r,g,b) = color.to_rgb();
+
+    // Gamma-correct
+    let r = r.sqrt();
+    let g = g.sqrt();
+    let b = b.sqrt();
+
+    let (rr,gg,bb) =
+        ((256.0 * clamp(r, 0.0, 0.999)) as u8,
+         (256.0 * clamp(g, 0.0, 0.999)) as u8,
+         (256.0 * clamp(b, 0.0, 0.999)) as u8);
+    println!("{} {} {}", rr, gg, bb);
 }
 
-fn ray_color(world: &impl Geometry, ray: Ray) -> Color {
-    if let Some(hit) = world.hit(ray, 0.0, f64::INFINITY) {
-        0.5 * Color::from_rgb(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0)
+fn ray_color<R: Rng + ?Sized>(rng : &mut R, world: &impl Geometry, ray: Ray, depth: i32) -> Color {
+
+    if depth <= 0 { return Color::from_rgb(0.0, 0.0, 0.0) }
+
+    if let Some(hit) = world.hit(ray, 0.001, f64::INFINITY) {
+        
+        let scatter_target = hit.p + hit.normal + random::unit_vector(rng);
+        let scatter_ray = Ray::through_points(hit.p, scatter_target);
+        0.5 * ray_color(rng, world, scatter_ray, depth-1)
+
+
     } else {
         let unit_direction = ray.direction.unit();
         let t = 0.5 * unit_direction.y + 1.0;
@@ -24,10 +44,10 @@ fn ray_color(world: &impl Geometry, ray: Ray) -> Color {
 }
 
 fn main() {
-    use rand::prelude::*;
     let mut rng = thread_rng();
 
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // Image
     let aspect_ratio = 16.0 / 9.0;
@@ -62,7 +82,7 @@ fn main() {
                 let t = (j as float + rng.gen::<float>()) / ((image_height - 1) as float);
 
                 let r = camera.get_ray(s, t);
-                total_color = total_color + ray_color(&world, r);
+                total_color = total_color + ray_color(&mut rng, &world, r, max_depth);
             }
 
             let avg_color = (1.0 / samples_per_pixel as float) * total_color;
