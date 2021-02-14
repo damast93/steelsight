@@ -19,11 +19,11 @@ pub mod random {
     use crate::*;
     use rand::prelude::*;
     
-    pub fn vector<R: Rng + ?Sized>(rng: &mut R, min: float, max: float) -> Vec3 {
+    pub fn vector(rng: &mut impl Rng, min: float, max: float) -> Vec3 {
         vec3(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
     }
 
-    pub fn in_unit_sphere<R: Rng + ?Sized>(rng: &mut R) -> Vec3 {
+    pub fn in_unit_sphere(rng: &mut impl Rng) -> Vec3 {
         let mut v = random::vector(rng, -1.0, 1.0);
         while v.length_squared() > 1.0 {
             v = random::vector(rng, -1.0, 1.0);
@@ -31,7 +31,7 @@ pub mod random {
         v
     }
 
-    pub fn unit_vector<R: Rng + ?Sized>(rng: &mut R) -> Vec3 {
+    pub fn unit_vector(rng: &mut impl Rng) -> Vec3 {
         random::in_unit_sphere(rng).unit()
     }
 }

@@ -11,7 +11,7 @@ use rand::prelude::*;
 fn write_color(color: Color) {
     let (r,g,b) = color.to_rgb();
 
-    // Gamma-correct
+    // Gamma correction 
     let r = r.sqrt();
     let g = g.sqrt();
     let b = b.sqrt();
@@ -23,7 +23,7 @@ fn write_color(color: Color) {
     println!("{} {} {}", rr, gg, bb);
 }
 
-fn ray_color<R: Rng + ?Sized>(rng : &mut R, world: &impl Geometry, ray: Ray, depth: i32) -> Color {
+fn ray_color(rng : &mut impl Rng, world: &impl Geometry, ray: Ray, depth: i32) -> Color {
 
     if depth <= 0 { return Color::from_rgb(0.0, 0.0, 0.0) }
 
@@ -47,7 +47,7 @@ fn main() {
     let mut rng = thread_rng();
 
     let samples_per_pixel = 100;
-    let max_depth = 50;
+    let max_depth = 12;
 
     // Image
     let aspect_ratio = 16.0 / 9.0;
