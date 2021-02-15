@@ -2,7 +2,8 @@ use crate::*;
 use crate::materials::*;
 
 pub struct Metal {
-    pub albedo: Color
+    pub albedo: Color,
+    pub fuzz: float // should be in [0,1]
 }
 
 fn reflect(v: Vec3, n: Vec3) -> Vec3 {
@@ -10,12 +11,13 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3 {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray_in: Ray, hit: &HitRecord, _rng: &mut Random) -> Option<Scattering> {
+    fn scatter(&self, ray_in: Ray, hit: &HitRecord, rng: &mut Random) -> Option<Scattering> {
         let reflected = reflect(ray_in.direction.unit(), hit.normal);
+        let scattered = reflected + self.fuzz * random::in_unit_sphere(rng);
 
-        if (reflected * hit.normal) > 0.0 {
+        if (scattered * hit.normal) > 0.0 {
             Some(Scattering {
-                scattered_ray: Ray { origin: hit.p, direction: reflected },
+                scattered_ray: Ray { origin: hit.p, direction: scattered },
                 attenuation: self.albedo
             })
         } else {
