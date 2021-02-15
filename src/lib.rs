@@ -10,5 +10,6 @@ pub use ray::*;
 pub use vec3::*;
 pub use utility::*;
 
-pub mod geometry;
 pub mod camera;
+pub mod geometry;
+pub mod materials;

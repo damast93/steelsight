@@ -55,4 +55,9 @@ impl Vec3 {
     pub fn unit(self) -> Vec3 {
        self / self.length()
     }
+
+    pub fn near_zero(self) -> bool {
+        const E: float = 1e-8;
+        (self.x.abs() < E) & (self.y.abs() < E) & (self.z.abs() < E) 
+    }
 }

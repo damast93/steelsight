@@ -1,9 +1,10 @@
 use crate::geometry::*;
 
+// Design decision: Geometries only borrow materials
 pub struct Sphere<'scene> {
     pub center: Vec3,
     pub radius: float,
-    pub material: &'scene dyn Material
+    pub material: &'scene dyn Material 
 }
 
 impl<'scene> Geometry for Sphere<'scene> {
@@ -28,6 +29,7 @@ impl<'scene> Geometry for Sphere<'scene> {
                 return None;
             } 
         }
+
         let p = r.at(root);
         let out_normal = (p - self.center) / self.radius;
         let (normal,front_side) = Ray::orient_normal(r, out_normal);

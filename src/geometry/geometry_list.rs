@@ -1,5 +1,7 @@
 use crate::geometry::*;
 
+// Design decision: The geometry list owns its child geometries
+// We need a 'scene lifetime constraint, because those might still borrow materials etc.
 pub struct GeometryList<'scene> {
     pub objects : Vec<Box<dyn Geometry + 'scene>>
 }

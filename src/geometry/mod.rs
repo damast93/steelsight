@@ -1,15 +1,12 @@
 use crate::*; // Import Vec3, float, etc ... (lib.rs)
+use crate::materials::*;
 
 // Facade pattern:
 // Declare child modules privately 
-mod material;
 mod sphere;
 mod geometry_list;
 
-pub mod lambertian;
-
 // And reexport them immediately
-pub use material::*;
 pub use sphere::*;
 pub use geometry_list::*;
 

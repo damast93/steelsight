@@ -1,6 +1,12 @@
 use crate::*;
 use crate::geometry::*;
 
+mod lambertian;
+mod metal;
+
+pub use lambertian::*;
+pub use metal::*;
+
 pub struct Scattering {
     pub scattered_ray: Ray,
     pub attenuation: Color,

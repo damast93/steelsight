@@ -5,7 +5,7 @@ extern crate steelsight;
 use steelsight::*;
 use steelsight::geometry::*;
 use steelsight::camera::*;
-use steelsight::geometry::lambertian::*;
+use steelsight::materials::*;
 
 fn write_color(color: Color) {
     let (r,g,b) = color.to_rgb();
@@ -69,12 +69,17 @@ fn main() {
     let camera = Camera::new(camera_args);
 
     // Materials
-    let gray_diffuse = Lambertian { albedo: Color::from_rgb(0.5, 0.5, 0.5) };
+    let material_ground = Lambertian { albedo: Color::from_rgb(0.8, 0.8, 0.0) };
+    let material_center = Lambertian { albedo: Color::from_rgb(0.7, 0.3, 0.3) };
+    let material_left = Metal { albedo: Color::from_rgb(0.8, 0.8, 0.8) };
+    let material_right = Metal { albedo: Color::from_rgb(0.8, 0.6, 0.2) };
 
     // Make world
     let mut world = GeometryList::new();
-    world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5, material: &gray_diffuse });
-    world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0, material: &gray_diffuse });
+    world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0, material: &material_ground });
+    world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5, material: &material_center });
+    world.push(Sphere { center: vec3(-1.0,0.0,-1.0), radius: 0.5, material: &material_left });
+    world.push(Sphere { center: vec3(1.0,0.0,-1.0), radius: 0.5, material: &material_right });
 
     // Render
 
