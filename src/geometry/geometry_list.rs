@@ -1,23 +1,23 @@
 use crate::geometry::*;
 
-pub struct GeometryList {
-    pub objects : Vec<Box<dyn Geometry>>
+pub struct GeometryList<'scene> {
+    pub objects : Vec<Box<dyn Geometry + 'scene>>
 }
 
-impl GeometryList {
-    pub fn new() -> GeometryList {
+impl<'scene> GeometryList<'scene> {
+    pub fn new() -> GeometryList<'scene> {
         GeometryList { objects: Vec::new() }
     }
 
     // Move `object` into its own Box and into the vector
-    // We need to put a 'static type constraint on `object`, i.e. it should not use any short-lived references ...
-    // This is because in the Box, it can live as long as it wants
-    pub fn push(&mut self, object: impl Geometry + 'static) {
+    // We need the 'scene lifetime constraint, because Geometries might borrow
+    // references to e.g. materials which only live as long as the scene  
+    pub fn push(&mut self, object: impl Geometry + 'scene) {
         self.objects.push(Box::new(object))
     }
 }
 
-impl Geometry for GeometryList {
+impl<'scene> Geometry for GeometryList<'scene> {
     fn hit(&self, ray: Ray, t_min: float, t_max: float) -> Option<HitRecord> {
         let mut best_hit = None;
         let mut closest_so_far = t_max;

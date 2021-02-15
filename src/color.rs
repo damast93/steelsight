@@ -33,6 +33,12 @@ impl ops::Mul<float> for Color {
     fn mul(self, r : float) -> Color { r * self } 
 }
 
+impl ops::Mul<Color> for Color {
+    type Output = Color;
+    fn mul(self, c : Color) -> Color { Color::from_rgb(self.r * c.r, self.g * c.g, self.b * c.b) }
+}
+
+
 impl ops::Div<float> for Color {
        type Output = Color;
        fn div(self, d : float) -> Color { (1.0/d) * self } 

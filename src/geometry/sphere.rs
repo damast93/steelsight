@@ -1,11 +1,12 @@
 use crate::geometry::*;
 
-pub struct Sphere {
+pub struct Sphere<'scene> {
     pub center: Vec3,
-    pub radius : float
+    pub radius: float,
+    pub material: &'scene dyn Material
 }
 
-impl Geometry for Sphere {
+impl<'scene> Geometry for Sphere<'scene> {
     fn hit(&self, r: Ray, t_min: float, t_max: float) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
@@ -30,6 +31,6 @@ impl Geometry for Sphere {
         let p = r.at(root);
         let out_normal = (p - self.center) / self.radius;
         let (normal,front_side) = Ray::orient_normal(r, out_normal);
-        Some(HitRecord { t: root, p, normal, front_side })
+        Some(HitRecord { t: root, p, normal, front_side, material: self.material })
     }
 }

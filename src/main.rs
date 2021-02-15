@@ -5,8 +5,7 @@ extern crate steelsight;
 use steelsight::*;
 use steelsight::geometry::*;
 use steelsight::camera::*;
-
-use rand::prelude::*;
+use steelsight::geometry::lambertian::*;
 
 fn write_color(color: Color) {
     let (r,g,b) = color.to_rgb();
@@ -23,28 +22,34 @@ fn write_color(color: Color) {
     println!("{} {} {}", rr, gg, bb);
 }
 
-fn ray_color(rng : &mut impl Rng, world: &impl Geometry, ray: Ray, depth: i32) -> Color {
+fn ray_color(world: &impl Geometry, ray: Ray, depth: i32, rng : &mut Random) -> Color {
 
-    if depth <= 0 { return Color::from_rgb(0.0, 0.0, 0.0) }
+    if depth <= 0 { 
+        return Color::from_rgb(0.0, 0.0, 0.0)
+    }
 
     if let Some(hit) = world.hit(ray, 0.001, f64::INFINITY) {
         
-        let scatter_target = hit.p + hit.normal + random::unit_vector(rng);
-        let scatter_ray = Ray::through_points(hit.p, scatter_target);
-        0.5 * ray_color(rng, world, scatter_ray, depth-1)
+        if let Some(scatter) = hit.material.scatter(ray, &hit, rng) {
+            scatter.attenuation * ray_color(world, scatter.scattered_ray, depth - 1, rng)
+        } else {
+            Color::from_rgb(0.0, 0.0, 0.0)
+        }
 
 
     } else {
+
         let unit_direction = ray.direction.unit();
         let t = 0.5 * unit_direction.y + 1.0;
         let a = Color::from_rgb(1.0, 1.0, 1.0);
         let b = Color::from_rgb(0.5, 0.7, 1.0);
         (1.0 - t) * a + t * b
+
     }
 }
 
 fn main() {
-    let mut rng = thread_rng();
+    let mut rng: Random = thread_rng();
 
     let samples_per_pixel = 100;
     let max_depth = 12;
@@ -63,10 +68,13 @@ fn main() {
     };
     let camera = Camera::new(camera_args);
 
+    // Materials
+    let gray_diffuse = Lambertian { albedo: Color::from_rgb(0.5, 0.5, 0.5) };
+
     // Make world
     let mut world = GeometryList::new();
-    world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5 });
-    world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0 });
+    world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5, material: &gray_diffuse });
+    world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0, material: &gray_diffuse });
 
     // Render
 
@@ -82,7 +90,7 @@ fn main() {
                 let t = (j as float + rng.gen::<float>()) / ((image_height - 1) as float);
 
                 let r = camera.get_ray(s, t);
-                total_color = total_color + ray_color(&mut rng, &world, r, max_depth);
+                total_color = total_color + ray_color(&world, r, max_depth, &mut rng);
             }
 
             let avg_color = (1.0 / samples_per_pixel as float) * total_color;
