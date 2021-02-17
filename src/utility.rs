@@ -26,7 +26,7 @@ pub mod random {
 
     pub fn in_unit_sphere(rng: &mut Random) -> Vec3 {
         let mut v = random::vector(-1.0, 1.0, rng);
-        while v.length_squared() > 1.0 {
+        while v.length_squared() >= 1.0 {
             v = random::vector(-1.0, 1.0, rng);
         }
         v
@@ -34,5 +34,13 @@ pub mod random {
 
     pub fn unit_vector(rng: &mut Random) -> Vec3 {
         random::in_unit_sphere(rng).unit()
+    }
+
+    pub fn in_unit_disk(rng: &mut Random) -> Vec3 {
+        let mut v = vec3(rng.gen_range(-1.0..1.0),rng.gen_range(-1.0..1.0), 0.0);
+        while v.length_squared() >= 1.0 {
+            v = vec3(rng.gen_range(-1.0..1.0),rng.gen_range(-1.0..1.0), 0.0)
+        }
+        v
     }
 }

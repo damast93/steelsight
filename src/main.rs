@@ -60,12 +60,17 @@ fn main() {
     let image_height = ((image_width as float) / aspect_ratio) as i32;
 
     // Camera
+    let lookfrom = vec3(3.0, 3.0, 2.0);
+    let lookat = vec3(0.0, 0.0, -1.0);
+    let focus_dist = (lookfrom - lookat).length();
     let camera_args = CameraArgs {
-        lookfrom: vec3(-2.0, 2.0, 1.0),
-        lookat: vec3(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
+        focus_dist,
         vup : vec3(0.0, 1.0, 0.0),
         vfow_degrees: 20.0,
         aspect_ratio,
+        aperture: 2.0
     };
     let camera = Camera::new(camera_args);
 
@@ -96,7 +101,7 @@ fn main() {
                 let s = (i as float + rng.gen::<float>()) / ((image_width - 1) as float);
                 let t = (j as float + rng.gen::<float>()) / ((image_height - 1) as float);
 
-                let r = camera.get_ray(s, t);
+                let r = camera.get_ray(s, t, &mut rng);
                 total_color = total_color + ray_color(&world, r, max_depth, &mut rng);
             }
 
