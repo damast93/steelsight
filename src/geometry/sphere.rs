@@ -5,7 +5,7 @@ use std::sync::Arc;
 pub struct Sphere {
     pub center: Vec3,
     pub radius: float,
-    pub material: Arc<dyn Material>
+    pub material: Arc<dyn Material + Send + Sync>
 }
 
 impl Geometry for Sphere {

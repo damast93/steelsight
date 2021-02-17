@@ -3,7 +3,7 @@ use crate::geometry::*;
 // Design decision: The geometry list owns its child geometries
 // We need a 'scene lifetime constraint, because those might still borrow materials etc.
 pub struct GeometryList {
-    pub objects : Vec<Box<dyn Geometry>>
+    pub objects : Vec<Box<dyn Geometry + Send + Sync>>
 }
 
 impl<'scene> GeometryList {
@@ -14,7 +14,7 @@ impl<'scene> GeometryList {
     // Move `object` into its own Box and into the vector
     // We need the 'scene lifetime constraint, because Geometries might borrow
     // references to e.g. materials which only live as long as the scene  
-    pub fn push(&mut self, object: impl Geometry + 'static) {
+    pub fn push(&mut self, object: impl Geometry + 'static + Send + Sync) {
         self.objects.push(Box::new(object))
     }
 }

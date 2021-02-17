@@ -155,7 +155,7 @@ fn main() {
 
     use rayon::prelude::*;
 
-    let samples : Vec<Vec<_>> = (0..samples_per_pixel).map(|i| {
+    let samples : Vec<Vec<_>> = (0..samples_per_pixel).into_par_iter().map(|i| {
         let mut rng = thread_rng();
         let mut colors = Vec::new();
 

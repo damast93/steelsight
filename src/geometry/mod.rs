@@ -21,7 +21,7 @@ pub struct HitRecord {
        pub p: Vec3,
        pub normal: Vec3,
        pub front_side: bool,
-       pub material: Arc<dyn Material> 
+       pub material: Arc<dyn Material + Send + Sync> 
 }
 
 pub trait Geometry {
