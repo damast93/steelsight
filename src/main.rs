@@ -7,7 +7,10 @@ use steelsight::geometry::*;
 use steelsight::camera::*;
 use steelsight::materials::*;
 
+use rayon::prelude::*;
+
 use std::sync::Arc;
+use std::sync::Mutex;
 
 fn random_scene() -> impl Geometry {
     let mut rng = rand_pcg::Pcg32::seed_from_u64(42);
@@ -125,12 +128,12 @@ fn ray_color(world: &impl Geometry, ray: Ray, depth: i32, rng : &mut Random) -> 
 }
 
 fn main() {
-    let samples_per_pixel = 25;
-    let max_depth = 6;
+    let samples_per_pixel = 100;
+    let max_depth = 24;
 
     // Image
     let aspect_ratio = 3.0 / 2.0;
-    let image_width: i32 = 400;
+    let image_width: i32 = 600;
     let image_height = ((image_width as float) / aspect_ratio) as i32;
 
     // Make world
@@ -153,9 +156,13 @@ fn main() {
 
     // Render
 
-    use rayon::prelude::*;
+    // Make a synchronized counter to track progress
+    let finished = Arc::new(Mutex::new(0));
 
-    let samples : Vec<Vec<_>> = (0..samples_per_pixel).into_par_iter().map(|i| {
+    // Clone a bunch of pointers to our counter
+    let counters : Vec<_> = (0..samples_per_pixel).map(|_| finished.clone()).collect();
+
+    let samples : Vec<Vec<_>> = counters.into_par_iter().map(|counter| {
         let mut rng = thread_rng();
         let mut colors = Vec::new();
 
@@ -169,7 +176,11 @@ fn main() {
                 colors.push(color)
             }
         }
-        eprintln!("Finished thread {}/{}", i, samples_per_pixel);
+
+        let mut n = counter.lock().unwrap();
+        *n += 1;
+        eprintln!("Sample {}/{}", n, samples_per_pixel);
+        
         colors
     }).collect();
 
