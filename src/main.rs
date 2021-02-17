@@ -65,7 +65,6 @@ fn main() {
         lookat: vec3(0.0, 0.0, -1.0),
         vup : vec3(0.0, 1.0, 0.0),
         vfow_degrees: 20.0,
-        focal_length: 1.0,
         aspect_ratio,
     };
     let camera = Camera::new(camera_args);

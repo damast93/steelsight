@@ -10,7 +10,6 @@ pub struct Camera {
 pub struct CameraArgs {
     pub aspect_ratio: float,
     pub vfow_degrees: float,
-    pub focal_length: float,
     pub lookfrom : Vec3,
     pub lookat : Vec3,
     pub vup : Vec3
