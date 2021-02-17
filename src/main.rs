@@ -61,8 +61,10 @@ fn main() {
 
     // Camera
     let camera_args = CameraArgs {
-        origin: vec3(0.0, 0.0, 0.0),
-        viewport_height: 2.0,
+        lookfrom: vec3(-2.0, 2.0, 1.0),
+        lookat: vec3(0.0, 0.0, -1.0),
+        vup : vec3(0.0, 1.0, 0.0),
+        vfow_degrees: 20.0,
         focal_length: 1.0,
         aspect_ratio,
     };

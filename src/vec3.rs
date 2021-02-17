@@ -51,10 +51,11 @@ impl Vec3 {
     pub fn length(self : Vec3) -> float { self.length_squared().sqrt() }
     pub const ZERO : Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
-    pub fn cross(a : Vec3, b : Vec3) -> Vec3 {
-       vec3(a.y*b.z - a.z*b.y,
-            a.z*b.x - a.x*b.z,
-            a.x*b.y - a.y*b.x)
+    pub fn cross(self : Vec3, b : Vec3) -> Vec3 {
+        let a = self;
+        vec3(a.y*b.z - a.z*b.y,
+             a.z*b.x - a.x*b.z,
+             a.x*b.y - a.y*b.x)
     }
 
     pub fn unit(self) -> Vec3 {
