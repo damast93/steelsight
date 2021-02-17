@@ -19,12 +19,12 @@ pub fn clamp(x: float, min: float, max: float) -> float {
 
 pub mod random {
     use crate::*;
-    
-    pub fn vector(min: float, max: float, rng: &mut Random) -> Vec3 {
+
+    pub fn vector(min: float, max: float, rng: &mut impl RngCore) -> Vec3 {
         vec3(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
     }
 
-    pub fn in_unit_sphere(rng: &mut Random) -> Vec3 {
+    pub fn in_unit_sphere(rng: &mut impl RngCore) -> Vec3 {
         let mut v = random::vector(-1.0, 1.0, rng);
         while v.length_squared() >= 1.0 {
             v = random::vector(-1.0, 1.0, rng);
@@ -32,15 +32,19 @@ pub mod random {
         v
     }
 
-    pub fn unit_vector(rng: &mut Random) -> Vec3 {
+    pub fn unit_vector(rng: &mut impl RngCore) -> Vec3 {
         random::in_unit_sphere(rng).unit()
     }
 
-    pub fn in_unit_disk(rng: &mut Random) -> Vec3 {
+    pub fn in_unit_disk(rng: &mut impl RngCore) -> Vec3 {
         let mut v = vec3(rng.gen_range(-1.0..1.0),rng.gen_range(-1.0..1.0), 0.0);
         while v.length_squared() >= 1.0 {
             v = vec3(rng.gen_range(-1.0..1.0),rng.gen_range(-1.0..1.0), 0.0)
         }
         v
+    }
+
+    pub fn color(min: float, max: float, rng: &mut impl RngCore) -> Color {
+        Color::from_rgb(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
     }
 }

@@ -1,13 +1,14 @@
 use crate::geometry::*;
+use std::rc::Rc;
 
-// Design decision: Geometries only borrow materials
-pub struct Sphere<'scene> {
+// Design decision: Now objects own/share their materials
+pub struct Sphere {
     pub center: Vec3,
     pub radius: float,
-    pub material: &'scene dyn Material 
+    pub material: Rc<dyn Material>
 }
 
-impl<'scene> Geometry for Sphere<'scene> {
+impl Geometry for Sphere {
     fn hit(&self, r: Ray, t_min: float, t_max: float) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
@@ -33,6 +34,6 @@ impl<'scene> Geometry for Sphere<'scene> {
         let p = r.at(root);
         let out_normal = (p - self.center) / self.radius;
         let (normal,front_side) = Ray::orient_normal(r, out_normal);
-        Some(HitRecord { t: root, p, normal, front_side, material: self.material })
+        Some(HitRecord { t: root, p, normal, front_side, material: self.material.clone() })
     }
 }

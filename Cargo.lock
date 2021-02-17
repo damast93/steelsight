@@ -70,10 +70,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_pcg"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7de198537002b913568a3847e53535ace266f93526caf5c360ec41d72c5787f0"
+dependencies = [
+ "rand_core",
+]
+
+[[package]]
 name = "steelsight"
 version = "0.1.0"
 dependencies = [
  "rand",
+ "rand_pcg",
 ]
 
 [[package]]
