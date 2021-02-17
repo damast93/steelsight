@@ -11,6 +11,8 @@ pub struct Color {
 impl Color {
        pub fn from_rgb(r : float, g : float, b : float) -> Color { Color { r, g, b } }
        pub fn to_rgb(self) -> (float,float,float) { (self.r, self.g, self.b) }
+
+       pub const ZERO : Color = Color { r: 0.0, g: 0.0, b: 0.0 };
 }
 
 impl ops::Add<Color> for Color {
@@ -37,7 +39,6 @@ impl ops::Mul<Color> for Color {
     type Output = Color;
     fn mul(self, c : Color) -> Color { Color::from_rgb(self.r * c.r, self.g * c.g, self.b * c.b) }
 }
-
 
 impl ops::Div<float> for Color {
        type Output = Color;

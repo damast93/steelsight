@@ -1,11 +1,11 @@
 use crate::geometry::*;
-use std::rc::Rc;
+use std::sync::Arc;
 
 // Design decision: Now objects own/share their materials
 pub struct Sphere {
     pub center: Vec3,
     pub radius: float,
-    pub material: Rc<dyn Material>
+    pub material: Arc<dyn Material>
 }
 
 impl Geometry for Sphere {

@@ -7,14 +7,14 @@ use steelsight::geometry::*;
 use steelsight::camera::*;
 use steelsight::materials::*;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 fn random_scene() -> impl Geometry {
     let mut rng = rand_pcg::Pcg32::seed_from_u64(42);
 
     let mut world = GeometryList::new();
 
-    let ground_material = Rc::new(Lambertian { albedo: Color::from_rgb(0.5, 0.5, 0.5) });
+    let ground_material = Arc::new(Lambertian { albedo: Color::from_rgb(0.5, 0.5, 0.5) });
     
     world.push(Sphere {
         center: vec3(0.0, -1000.0, 0.0), 
@@ -35,7 +35,7 @@ fn random_scene() -> impl Geometry {
                 if mat_choice < 0.8 {
                     // diffuse
                     let albedo = random::color(0.0, 1.0, &mut rng) * random::color(0.0, 1.0, &mut rng);
-                    let material = Rc::new(Lambertian { albedo });
+                    let material = Arc::new(Lambertian { albedo });
                     world.push(Sphere {
                         center, radius: 0.2, material
                     })
@@ -43,13 +43,13 @@ fn random_scene() -> impl Geometry {
                     // metal
                     let albedo = random::color(0.5, 1.0, &mut rng);
                     let fuzz = rng.gen_range(0.0..0.5);
-                    let material = Rc::new(Metal { albedo, fuzz });
+                    let material = Arc::new(Metal { albedo, fuzz });
                     world.push(Sphere {
                         center, radius: 0.2, material
                     })
                 } else {
                     // glass
-                    let material = Rc::new(Dielectric { eta: 1.5 });
+                    let material = Arc::new(Dielectric { eta: 1.5 });
                     world.push(Sphere {
                         center, radius: 0.2, material
                     })
@@ -58,14 +58,14 @@ fn random_scene() -> impl Geometry {
         }
     }
 
-    let material1 = Rc::new(Dielectric { eta: 1.5 });
+    let material1 = Arc::new(Dielectric { eta: 1.5 });
     world.push(Sphere {
         center: vec3(0.0, 1.0, 0.0),
         radius: 1.0,
         material: material1
     });
 
-    let material2 = Rc::new(Lambertian { 
+    let material2 = Arc::new(Lambertian { 
         albedo: Color::from_rgb(0.4, 0.2, 0.1)
     });
     world.push(Sphere {
@@ -74,7 +74,7 @@ fn random_scene() -> impl Geometry {
         material: material2
     });
 
-    let material3 = Rc::new(Metal {
+    let material3 = Arc::new(Metal {
         albedo: Color::from_rgb(0.7, 0.6, 0.5),
         fuzz: 0.0
     });
@@ -125,14 +125,12 @@ fn ray_color(world: &impl Geometry, ray: Ray, depth: i32, rng : &mut Random) -> 
 }
 
 fn main() {
-    let mut rng: Random = thread_rng();
-
-    let samples_per_pixel = 500;
-    let max_depth = 24;
+    let samples_per_pixel = 25;
+    let max_depth = 6;
 
     // Image
     let aspect_ratio = 3.0 / 2.0;
-    let image_width: i32 = 1200;
+    let image_width: i32 = 400;
     let image_height = ((image_width as float) / aspect_ratio) as i32;
 
     // Make world
@@ -155,24 +153,37 @@ fn main() {
 
     // Render
 
-    println!("P3\n{} {}\n255", image_width, image_height);
+    use rayon::prelude::*;
 
-    for j in (0..image_height).rev() {
-        eprint!("\nScanlines remaining: {}", j);
-        for i in 0..image_width {
-            let mut total_color = Color::from_rgb(0.0, 0.0, 0.0);
+    let samples : Vec<Vec<_>> = (0..samples_per_pixel).map(|i| {
+        let mut rng = thread_rng();
+        let mut colors = Vec::new();
 
-            for _sample in 0..samples_per_pixel {
+        for j in (0..image_height).rev() {
+            for i in 0..image_width {
                 let s = (i as float + rng.gen::<float>()) / ((image_width - 1) as float);
                 let t = (j as float + rng.gen::<float>()) / ((image_height - 1) as float);
 
                 let r = camera.get_ray(s, t, &mut rng);
-                total_color = total_color + ray_color(&world, r, max_depth, &mut rng);
+                let color = ray_color(&world, r, max_depth, &mut rng);
+                colors.push(color)
             }
-
-            let avg_color = (1.0 / samples_per_pixel as float) * total_color;
-            write_color(avg_color);
         }
+        eprintln!("Finished thread {}/{}", i, samples_per_pixel);
+        colors
+    }).collect();
+
+    eprintln!("\nWriting image");
+
+    // Print image
+           
+    println!("P3\n{} {}\n255", image_width, image_height);
+
+    for i in 0..(image_width * image_height) {
+        let total_color = (0..samples_per_pixel).map(|s| samples[s as usize][i as usize]).fold(Color::ZERO, |a, b| a + b);
+        let avg_color = (1.0 / samples_per_pixel as float) * total_color;
+        write_color(avg_color);
     }
+
     eprintln!("\nDone");
 }
