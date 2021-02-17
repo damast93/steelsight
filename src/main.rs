@@ -156,13 +156,22 @@ fn main() {
 
     // Render
 
+    struct Progress {
+        counter : i32,
+        total : Vec<Color>
+    } 
+
     // Make a synchronized counter to track progress
-    let finished = Arc::new(Mutex::new(0));
+    let num_pixels = (image_width * image_height) as usize;
+    let mutex = Arc::new(Mutex::new(Progress { 
+        counter: 0,
+        total: (0..num_pixels).map(|_| Color::ZERO).collect()
+    }));
 
-    // Clone a bunch of pointers to our counter
-    let counters : Vec<_> = (0..samples_per_pixel).map(|_| finished.clone()).collect();
+    // Clone a bunch of pointers to our counter (can't we just share it?)
+    let mutexes : Vec<_> = (0..samples_per_pixel).map(|_| mutex.clone()).collect();
 
-    let samples : Vec<Vec<_>> = counters.into_par_iter().map(|counter| {
+    mutexes.into_par_iter().for_each(|mutex| {
         let mut rng = thread_rng();
         let mut colors = Vec::new();
 
@@ -177,12 +186,17 @@ fn main() {
             }
         }
 
-        let mut n = counter.lock().unwrap();
-        *n += 1;
-        eprintln!("Sample {}/{}", n, samples_per_pixel);
+        let mut progress = mutex.lock().unwrap();
         
-        colors
-    }).collect();
+        progress.counter += 1;
+
+        for i in 0usize..num_pixels {
+            progress.total[i] = progress.total[i] + colors[i]
+        }
+
+        eprintln!("Sample {}/{}", progress.counter, samples_per_pixel);
+        
+    });
 
     eprintln!("\nWriting image");
 
@@ -190,9 +204,10 @@ fn main() {
            
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    for i in 0..(image_width * image_height) {
-        let total_color = (0..samples_per_pixel).map(|s| samples[s as usize][i as usize]).fold(Color::ZERO, |a, b| a + b);
-        let avg_color = (1.0 / samples_per_pixel as float) * total_color;
+    let result = mutex.lock().unwrap();
+
+    for color in result.total.iter() {
+        let avg_color = (1.0 / samples_per_pixel as float) * (*color);
         write_color(avg_color);
     }
 
