@@ -70,7 +70,7 @@ fn main() {
 
     // Materials
     let material_ground = Lambertian { albedo: Color::from_rgb(0.8, 0.8, 0.0) };
-    let material_center = Dielectric { eta: 1.5 };
+    let material_center = Lambertian { albedo: Color::from_rgb(0.1, 0.2, 0.5) };
     let material_left = Dielectric { eta: 1.5 };
     let material_right = Metal { albedo: Color::from_rgb(0.8, 0.6, 0.2), fuzz: 1.0 };
 
@@ -78,7 +78,8 @@ fn main() {
     let mut world = GeometryList::new();
     world.push(Sphere { center: vec3(0.0,-100.5,-1.0), radius: 100.0, material: &material_ground });
     world.push(Sphere { center: vec3(0.0,0.0,-1.0), radius: 0.5, material: &material_center });
-    world.push(Sphere { center: vec3(-1.0,0.0,-1.0), radius: 0.5, material: &material_left });
+    // Negative radius means surface normals point inwards!
+    world.push(Sphere { center: vec3(-1.0,0.0,-1.0), radius: -0.4, material: &material_left }); 
     world.push(Sphere { center: vec3(1.0,0.0,-1.0), radius: 0.5, material: &material_right });
 
     // Render

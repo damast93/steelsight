@@ -6,7 +6,7 @@ pub struct Metal {
     pub fuzz: float // should be in [0,1]
 }
 
-fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
     v - 2.0 * (v * n) * n
 }
 

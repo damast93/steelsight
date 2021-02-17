@@ -16,6 +16,6 @@ impl Ray {
        }
 
        pub fn orient_normal(ray : Ray, outward_normal : Vec3) -> (Vec3,bool) {
-              if ray.direction * outward_normal < 0.0 { (outward_normal, true) } else { ((-1.0) * outward_normal, false) }
+              if ray.direction * outward_normal < 0.0 { (outward_normal, true) } else { (-outward_normal, false) }
        }
 }

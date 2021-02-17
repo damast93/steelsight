@@ -41,6 +41,11 @@ impl ops::Div<float> for Vec3 {
        fn div(self, d : float) -> Vec3 { (1.0/d) * self } 
 }
 
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Vec3 { (-1.0) * self }
+}
+
 impl Vec3 {
     pub fn length_squared(self : Vec3) -> float { self * self }
     pub fn length(self : Vec3) -> float { self.length_squared().sqrt() }
